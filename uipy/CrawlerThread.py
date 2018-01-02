@@ -1,7 +1,6 @@
 # author : YangWan
 from PyQt5 import QtCore, QtGui
-import time
-
+from crawler.pcbaidusearch import PcBaiduSearch
 
 class CrawlerHandler(QtCore.QThread):
     finishSignal = QtCore.pyqtSignal(list)
@@ -11,5 +10,6 @@ class CrawlerHandler(QtCore.QThread):
         pass
 
     def run(self):
-        time.sleep(6)
+        test = PcBaiduSearch("全民彩票", 1)
+        test.genrate_pageurl()
         self.finishSignal.emit(['hello,', 'world', '!'])

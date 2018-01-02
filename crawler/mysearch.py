@@ -23,10 +23,10 @@ class MySearch(object):
     def parse_result_page(self, result):
         pass
 
-    #解析推荐搜索
-    def parse_recommend_search(self):
+    #解析相关搜索
+    def parse_relate_search(self, relate_div):
         pass
 
     #解析其他搜索
-    def parse_other_search(self):
+    def parse_other_search(self, result):
         pass
