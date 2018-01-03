@@ -24,8 +24,6 @@ class CrawlerItem(object):
                        self.domain, self.relate_search, self.other_search)
        return object_dec
 
-    def __setattr__(self, key, value):
-        self.__dict__[key] = value
 
 
     # item = CrawlerItem("百度", "全民彩票", "4", "3", "我爱全名彩票", "我是内容", "页面链接", "网站域名", "推荐搜索", "相关搜索")

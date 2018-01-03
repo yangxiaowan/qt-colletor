@@ -9,11 +9,16 @@ import re
 百度网页爬虫
 '''
 class PcBaiduSearch(MySearch):
+    # 搜索排名
+    page_index = 0
+
+    # 档期解析页面
+    cur_parse_page = 0
 
     #其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
     other_search_dit = {}
 
-    relate_search_list = []
+    relate_search_list = {}
 
     website_start_url = 'https://www.baidu.com'
 
@@ -32,7 +37,11 @@ class PcBaiduSearch(MySearch):
     def genrate_pageurl(self):
         super().genrate_pageurl()
         for page_index in range(1, self.pagenum + 1):
-            request_url = self.domain_url + self.keyword + "&pn=" + str(page_index)
+            self.cur_parse_page += 1
+            if page_index > 1:
+                request_url = self.domain_url + self.keyword + "&pn=" + str((page_index - 1) * 10)
+            else:
+                request_url = self.domain_url + self.keyword
             print("正在爬取页面url:", request_url)
             page_resource = self.get_content_whitget(request_url, 'utf-8')
             beautiful_soup = BeautifulSoup(page_resource.text, 'lxml')
@@ -60,12 +69,14 @@ class PcBaiduSearch(MySearch):
         if relate_table is not None:
             relate_search_th = relate_table.find_all("th")
             print("搜索到相关词条数目:", len(relate_search_th))
+            relate_result_list = []
             for relate_search_item in relate_search_th:
                 single_dit = {}
                 single_dit['text'] = relate_search_item.find("a").string
                 single_dit['url'] = self.website_start_url + relate_search_item.find("a").get("href")
-                self.relate_search_list.append(single_dit)
+                relate_result_list.append(single_dit)
                 print(single_dit['text'], single_dit['url'])
+            self.relate_search_list[1] = relate_result_list
             print(self.relate_search_list)
         print("百度相关搜索解析完毕.....................")
 
@@ -99,12 +110,41 @@ class PcBaiduSearch(MySearch):
                 craw_item = CrawlerItem()
                 content_h3 = content_div_item.find("h3", attrs={'class': re.compile("t.*")})
                 if content_h3 is not None:
+                    self.page_index += 1
                     content_titlea = content_h3.find("a")
-                    print(content_titlea.txt)
-                    # craw_item.__setattr__('title', content_titlea.string)
-                    # craw_item.__setattr__('pageurl', content_titlea.get("href"))
-                    # print(craw_item)
+                    setattr(craw_item, 'search', "PC端百度")
+                    setattr(craw_item, 'keyword', self.keyword)
+                    setattr(craw_item, 'title', content_titlea.get_text())
+                    setattr(craw_item, 'page_url', content_titlea.get("href"))
+                    setattr(craw_item, 'index', self.page_index)
+                    setattr(craw_item, 'page', str(self.cur_parse_page))
+                content_desc_div = content_div_item.find("div", attrs={'class': re.compile(".*(c-abstract).*")})
+                if content_desc_div is not None:
+                    setattr(craw_item, 'content', content_desc_div.get_text())
+                else:
+                    content_desc_div = content_div_item.find(attrs={'class': re.compile(".*(c-row).*")})
+                    setattr(craw_item, 'content', re.sub('[\r\n\t\b ]', '', content_desc_div.get_text()))
+                website_domain_div = content_div_item.find("div", attrs={'class': re.compile(".*f13.*")})
+                if website_domain_div is not None:
+                    showurl_a = website_domain_div.find(attrs={'class': "c-showurl"})
+                    if showurl_a is None:
+                        showurl_a = website_domain_div.find("a")
+                    setattr(craw_item, 'domain', showurl_a.get_text())
+                else:
+                    showurl_a = content_div_item.find_all("span", attrs={'class': "c-showurl"})[0]
+                    setattr(craw_item, 'domain', showurl_a.get_text())
+                offset_div = content_div_item.find("div", attrs={'class': "c-offset"})
+                # 解析类似于百度知道的下拉连接
+                if offset_div is not None:
+                    craw_other_item = CrawlerItem()
+                    down_list_tr = offset_div.find_all("tr")
+                    print("解析百度知道，找到下拉连接个数： ", len(down_list_tr))
+                    for down_item in down_list_tr:
+                        setattr(craw_other_item, 'title', down_item.find("a").get_text())
+                        setattr(craw_other_item, 'page', down_item.find("a").get("href"))
+                        print(craw_other_item)
+                print(craw_item)
 
 
-test = PcBaiduSearch("全民彩票", 1)
+test = PcBaiduSearch("全名彩票", 4)
 test.genrate_pageurl()
