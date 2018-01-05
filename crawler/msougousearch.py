@@ -116,29 +116,34 @@ class MBaiduSearch(MySearch):
                 data_extquery = content_div_item.get("data-extquery")
                 # 如果data-extquery不为空，则为网站词条
                 if data_extquery is None:
-                    craw_item = CrawlerItem()
                     content_title = content_div_item.find("h3", attrs={'class': 'vr-tit'})
+                    if content_title is None:
+                        content_title = content_div_item.find("h3")
                     if content_title is not None:
+                        craw_item = CrawlerItem()
                         self.page_index += 1
                         setattr(craw_item, 'search', "移动端搜狗")
                         setattr(craw_item, 'keyword', self.keyword)
-                        setattr(craw_item, 'title', content_title.get_text())
-                        setattr(craw_item, 'page_url', content_title.get("href"))
+                        setattr(craw_item, 'title', re.sub('[\r\n\t\b ]', '', content_title.get_text()))
+                        content_title_a = content_title.find("a")
+                        if content_title_a is None:
+                            content_title_a = content_div_item.find("a")
+                        if content_title_a is not None:
+                            setattr(craw_item, 'page_url', content_title_a.get("href"))
                         setattr(craw_item, 'index', self.page_index)
                         setattr(craw_item, 'page', str(self.cur_parse_page))
                         content_desc_div = \
                             content_div_item.find("div", attrs={'class': re.compile("^(info|text-layout)$")})
                         if content_desc_div is None:
-                            print(content_div_item)
-                            content_div_item.find("div")
-                        setattr(craw_item, 'content', content_desc_div.get_text())
+                            content_desc_div = content_div_item.find("div")
+                        setattr(craw_item, 'content', re.sub('[\r\n\t\b ]', '', content_desc_div.get_text()))
                         website_domain_span = content_div_item.find("div", attrs={'class': re.compile(".*(citeurl).*")})
                         if website_domain_span is not None:
                             setattr(craw_item, 'domain', website_domain_span.get_text())
                         else:
                             setattr(craw_item, 'domain', 'wenwen.sougou.com')
-                print(craw_item)
+                        print(craw_item)
 
 
-test = MBaiduSearch("捡到彩票中奖犯法吗", 1)
+test = MBaiduSearch("全名彩票", 1)
 test.genrate_pageurl()
