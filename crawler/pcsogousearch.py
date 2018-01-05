@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 from crawler.mysearch import MySearch
 from file.crawleritem import CrawlerItem
+from file.productitem import ProductItem
 import re
 
 '''
@@ -34,13 +35,9 @@ class PcSogouSearch(MySearch):
 
     recommend_search_index = 0
 
-    def __init__(self, keyword, pagenum):
-        self.keyword = keyword
-        self.pagenum = pagenum
-
     def genrate_pageurl(self):
-        super().genrate_pageurl()
-        for page_index in range(1, self.pagenum + 1):
+        self.cur_parse_page = self.start_parse_index - 1
+        for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1
             request_url = self.domain_url + self.keyword + "&page=" + str(page_index)
             print("正在爬取页面url:", request_url)
@@ -52,14 +49,14 @@ class PcSogouSearch(MySearch):
             other_search_div = beautiful_soup.find('dl', attrs={'class': 'hint2'})
             # 定位到相关搜索
             relate_search_div = beautiful_soup.find('div', attrs={'class': 'hintBox'})
-            print("************************************************************", other_search_div)
             if other_search_div is not None:
                 self.parse_other_search(other_search_div)
             if relate_search_div is not None and \
                             self.relate_search_parseflag is False and self.recommend_search_index < 2:
                 self.recommend_search_index += 1
                 self.parse_relate_search(relate_search_div)
-                # self.parse_result_page(content_div)
+            self.parse_result_page(content_div)
+            self.product_item = ProductItem(self.content_parse_list, self.relate_search_list, self.other_search_dit)
 
     def parse_relate_search(self, relate_div):
         print("正在解析搜狗相关搜索.....................")
@@ -146,10 +143,10 @@ class PcSogouSearch(MySearch):
                             setattr(craw_box_item, 'title', li_list_item.find("a").get_text().replace('\n', ''))
                             setattr(craw_box_item, 'page', li_list_item.find("a").get("href").replace('\n', ''))
                             print(craw_box_item)
+                self.content_parse_list.append(craw_item)
                 print(craw_item)
         print("搜索到网站词条数目为:", len(content_div_list))
         print("解析搜狗网站词条内容结束.....................")
 
-
-test = PcSogouSearch("360彩票导航", 10)
-test.genrate_pageurl()
+# test = PcSogouSearch("saf", 1, 2)
+# test.genrate_pageurl()

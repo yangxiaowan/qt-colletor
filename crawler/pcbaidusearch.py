@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 from crawler.mysearch import MySearch
 from file.crawleritem import CrawlerItem
+from file.productitem import ProductItem
 import re
 
 '''
@@ -30,13 +31,9 @@ class PcBaiduSearch(MySearch):
     #是否进行推荐搜索的解析
     recommend_search_parseflag = False
 
-    def __init__(self, keyword, pagenum):
-        self.keyword = keyword
-        self.pagenum = pagenum
-
     def genrate_pageurl(self):
-        super().genrate_pageurl()
-        for page_index in range(1, self.pagenum + 1):
+        self.cur_parse_page = self.start_parse_index - 1
+        for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1
             if page_index > 1:
                 request_url = self.domain_url + self.keyword + "&pn=" + str((page_index - 1) * 10)
@@ -58,6 +55,8 @@ class PcBaiduSearch(MySearch):
             if self.relate_search_parseflag is False:
                 self.parse_relate_search(relate_search_div)
             self.parse_result_page(content_div)
+            # 获得生成对象，在接下来的get_product_item方法时会返回生产对象
+            self.product_item = ProductItem(self.content_parse_list, self.relate_search_list, self.other_search_dit)
 
     '''
     相关搜索解析，只需解析一次,其他页面的相关搜索是相同的
@@ -138,6 +137,8 @@ class PcBaiduSearch(MySearch):
                     showurl_a = content_div_item.find_all("span", attrs={'class': "c-showurl"})[0]
                     setattr(craw_item, 'domain', showurl_a.get_text())
                 offset_div = content_div_item.find("div", attrs={'class': "c-offset"})
+                # 将解析词条加入数列
+                self.content_parse_list.append(craw_item)
                 # 解析类似于百度知道的下拉连接
                 if offset_div is not None:
                     craw_other_item = CrawlerItem()
@@ -147,8 +148,8 @@ class PcBaiduSearch(MySearch):
                         setattr(craw_other_item, 'title', down_item.find("a").get_text())
                         setattr(craw_other_item, 'page', down_item.find("a").get("href"))
                         print(craw_other_item)
+                        self.content_parse_list.append(craw_other_item)
                 print(craw_item)
 
-
-test = PcBaiduSearch("全名彩票", 4)
-test.genrate_pageurl()
+# test = PcBaiduSearch("全名彩票", 1, 2, 5)
+# test.genrate_pageurl()

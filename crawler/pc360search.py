@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 from crawler.mysearch import MySearch
 from file.crawleritem import CrawlerItem
+from file.productitem import ProductItem
 import re
 
 '''
@@ -33,13 +34,10 @@ class Pc360Search(MySearch):
 
     recommend_search_index = 0
 
-    def __init__(self, keyword, pagenum):
-        self.keyword = keyword
-        self.pagenum = pagenum
-
     def genrate_pageurl(self):
         super().genrate_pageurl()
-        for page_index in range(1, self.pagenum + 1):
+        self.cur_parse_page = self.start_parse_index - 1
+        for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1
             request_url = self.domain_url + self.keyword + "&page=" + str(page_index)
             print("正在爬取页面url:", request_url)
@@ -60,6 +58,7 @@ class Pc360Search(MySearch):
                 self.parse_relate_search(relate_search_div)
                 self.relate_search_parseflag = True
             self.parse_result_page(content_div)
+            self.product_item = ProductItem(self.content_parse_list, self.relate_search_list, self.other_search_dit)
 
     def parse_other_search(self, result):
         print("正在解析360为您推荐.....................")
@@ -123,9 +122,9 @@ class Pc360Search(MySearch):
                         linkinfo = temp_url.find("cite").get_text()
                 setattr(craw_item, 'domain', linkinfo)
                 setattr(craw_item, 'index', self.page_index)
+                self.content_parse_list.append(craw_item)
                 print(craw_item)
         print("解析360页面结束......................")
 
-
-test = Pc360Search("360彩票", 10)
-test.genrate_pageurl()
+# test = Pc360Search("360彩票", 1, 3, 10)
+# test.genrate_pageurl()

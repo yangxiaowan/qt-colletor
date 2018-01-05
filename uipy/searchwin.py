@@ -276,7 +276,7 @@ class Ui_search(object):
             return
         else:
             self.keyword_list = self.keyword.split(',|，')
-        from thread.crawlerthread import CrawlerHandler
+        from thread.guithread import CrawlerHandler
         self.crawler_process = CrawlerHandler()
         # 登陆完成的信号绑定到登陆结束的槽函数
         self.crawler_process.finishSignal.connect(self.finishCrawler)

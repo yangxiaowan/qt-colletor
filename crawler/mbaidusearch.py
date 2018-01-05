@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 from crawler.mysearch import MySearch
 from file.crawleritem import CrawlerItem
+from file.productitem import ProductItem
 import re
 
 '''
@@ -38,7 +39,8 @@ class MBaiduSearch(MySearch):
 
     def genrate_pageurl(self):
         super().genrate_pageurl()
-        for page_index in range(1, self.pagenum + 1):
+        self.cur_parse_page = self.start_parse_index - 1
+        for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1
             # 移动端和pc端连接方式相同
             if page_index > 1:
@@ -64,6 +66,7 @@ class MBaiduSearch(MySearch):
                     self.parse_relate_search(relate_search_div)
                     self.relate_search_parseflag = True
             self.parse_result_page(content_div)
+            self.product_item = ProductItem(self.content_parse_list, self.relate_search_list, self.other_search_dit)
 
     '''
     相关搜索解析，只需解析一次,其他页面的相关搜索是相同的
@@ -148,8 +151,8 @@ class MBaiduSearch(MySearch):
                     #         setattr(craw_other_item, 'title', down_item.find("a").get_text())
                     #         setattr(craw_other_item, 'page', down_item.find("a").get("href"))
                     #         print(craw_other_item)
+                self.content_parse_list.append(craw_item)
                 print(craw_item)
 
-
-test = MBaiduSearch("捡到彩票中奖犯法吗", 4)
-test.genrate_pageurl()
+# test = MBaiduSearch("捡到彩票中奖犯法吗", 4)
+# test.genrate_pageurl()

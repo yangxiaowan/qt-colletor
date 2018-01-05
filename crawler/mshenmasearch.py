@@ -3,8 +3,7 @@
 from bs4 import BeautifulSoup
 from crawler.mysearch import MySearch
 from file.crawleritem import CrawlerItem
-import re
-
+from file.productitem import ProductItem
 # http://m.sm.cn/s?q=%E9%85%B8%E5%A5%B6%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%96%9D%E6%AF%94%E8%BE%83%E5%A5%BD
 class MShenmaSearch(MySearch):
     # 搜索排名
@@ -34,7 +33,8 @@ class MShenmaSearch(MySearch):
 
     def genrate_pageurl(self):
         super().genrate_pageurl()
-        for page_index in range(1, self.pagenum + 1):
+        self.cur_parse_page = self.start_parse_index - 1
+        for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1
             # 移动端和pc端连接方式相同
             request_url = self.domain_url + self.keyword + "&page=" + str(page_index)
@@ -49,6 +49,7 @@ class MShenmaSearch(MySearch):
                 if relate_search_div is not None:
                     self.parse_relate_search(relate_search_div)
             self.parse_result_page(parse_div)
+            self.product_item = ProductItem(self.content_parse_list, self.relate_search_list, self.other_search_dit)
 
     def parse_result_page(self, result):
         content_div_list = result.find_all("div", attrs={'class': 'article ali_row'})
@@ -72,6 +73,7 @@ class MShenmaSearch(MySearch):
                     down_link_div = result.find("div", attrs={'class': 'other'})
                     if down_link_div is not None:
                         setattr(craw_item, 'domain', down_link_div.get_text())
+                self.content_parse_list.append(craw_item)
                 print(craw_item)
 
     def parse_relate_search(self, relate_div):
@@ -94,6 +96,5 @@ class MShenmaSearch(MySearch):
     def parse_other_search(self, result):
         pass
 
-
-test = MShenmaSearch("全名彩票", 10)
-test.genrate_pageurl()
+# test = MShenmaSearch("全名彩票", 10)
+# test.genrate_pageurl()
