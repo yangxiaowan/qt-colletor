@@ -10,7 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QProgressDialog
 from uipy.searchbar import ProgressBar
-
+import os
 
 class Ui_search(object):
 
@@ -22,6 +22,12 @@ class Ui_search(object):
     keyword_list = []
 
     task_finish = False
+
+    pagenum = 1
+
+    dir_path = 'C:\colletor-result'
+
+    file_name = ''
 
     def setupUi(self, search):
         search.setObjectName("search")
@@ -58,6 +64,7 @@ class Ui_search(object):
         self.keywordEdit = QtWidgets.QTextEdit(search)
         self.keywordEdit.setGeometry(QtCore.QRect(410, 80, 261, 41))
         self.keywordEdit.setObjectName("keywordEdit")
+        self.keywordEdit.setFont(font)
         self.pagenumLabel = QtWidgets.QLabel(search)
         self.pagenumLabel.setGeometry(QtCore.QRect(310, 140, 121, 61))
         font = QtGui.QFont()
@@ -92,48 +99,54 @@ class Ui_search(object):
         font.setPointSize(14)
         font.setBold(True)
         font.setWeight(75)
+        self.pagenumEdit.setFont(font)
         self.excelButton.setFont(font)
         self.excelButton.setObjectName("excelButton")
         self.saveFileLabel = QtWidgets.QLabel(search)
         self.saveFileLabel.setGeometry(QtCore.QRect(310, 280, 121, 61))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
         self.saveFileLabel.setFont(font)
         self.saveFileLabel.setObjectName("saveFileLabel")
         self.saveFileEdit = QtWidgets.QTextEdit(search)
-        self.saveFileEdit.setGeometry(QtCore.QRect(390, 290, 311, 41))
+        self.saveFileEdit.setGeometry(QtCore.QRect(410, 290, 300, 41))
         self.saveFileEdit.setObjectName("saveFileEdit")
-        self.isClassLabel = QtWidgets.QLabel(search)
-        self.isClassLabel.setGeometry(QtCore.QRect(310, 340, 121, 61))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.isClassLabel.setFont(font)
-        self.isClassLabel.setObjectName("isClassLabel")
-        self.classYesCheckbox = QtWidgets.QCheckBox(search)
-        self.classYesCheckbox.setGeometry(QtCore.QRect(400, 360, 63, 23))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        self.classYesCheckbox.setFont(font)
-        self.classYesCheckbox.setAutoFillBackground(True)
-        self.classYesCheckbox.setObjectName("classYesCheckbox")
-        self.classNoCheckbox = QtWidgets.QCheckBox(search)
-        self.classNoCheckbox.setGeometry(QtCore.QRect(490, 360, 63, 23))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        self.classNoCheckbox.setFont(font)
-        self.classNoCheckbox.setObjectName("classNoCheckbox")
+        self.saveFileEdit.setFont(font)
+
+        self.saveFileNameLabel = QtWidgets.QLabel(search)
+        self.saveFileNameLabel.setGeometry(QtCore.QRect(310, 340, 121, 61))
+        self.saveFileNameLabel.setFont(font)
+        self.saveFileNameLabel.setObjectName("saveFileNameLabel")
+        self.saveFileNameEdit = QtWidgets.QTextEdit(search)
+        self.saveFileNameEdit.setGeometry(QtCore.QRect(420, 350, 200, 41))
+        self.saveFileNameEdit.setObjectName("saveFileNameEdit")
+        self.saveFileNameEdit.setFont(font)
+        # self.isClassLabel = QtWidgets.QLabel(search)
+        # self.isClassLabel.setGeometry(QtCore.QRect(310, 340, 121, 61))
+        # font = QtGui.QFont()
+        # font.setFamily("Calibri")
+        # font.setPointSize(12)
+        # font.setBold(True)
+        # font.setWeight(75)
+        # self.isClassLabel.setFont(font)
+        # self.isClassLabel.setObjectName("isClassLabel")
+        # self.classYesCheckbox = QtWidgets.QCheckBox(search)
+        # self.classYesCheckbox.setGeometry(QtCore.QRect(400, 360, 63, 23))
+        # font = QtGui.QFont()
+        # font.setFamily("Calibri")
+        # font.setPointSize(14)
+        # font.setBold(True)
+        # font.setWeight(75)
+        # self.classYesCheckbox.setFont(font)
+        # self.classYesCheckbox.setAutoFillBackground(True)
+        # self.classYesCheckbox.setObjectName("classYesCheckbox")
+        # self.classNoCheckbox = QtWidgets.QCheckBox(search)
+        # self.classNoCheckbox.setGeometry(QtCore.QRect(490, 360, 63, 23))
+        # font = QtGui.QFont()
+        # font.setFamily("Calibri")
+        # font.setPointSize(14)
+        # font.setBold(True)
+        # font.setWeight(75)
+        # self.classNoCheckbox.setFont(font)
+        # self.classNoCheckbox.setObjectName("classNoCheckbox")
         self.splitter = QtWidgets.QSplitter(search)
         self.splitter.setGeometry(QtCore.QRect(80, 140, 63, 81))
         self.splitter.setOrientation(QtCore.Qt.Vertical)
@@ -233,7 +246,8 @@ class Ui_search(object):
         else:
             self.search_class['m_shenma'] = 0
 
-    def completeSearchParams(self):
+    def generateExcel(self):
+        self.generateSearchClass()
         self.keyword = self.keywordEdit.toPlainText()
         pagenumStr = self.pagenumEdit.toPlainText()
         try:
@@ -243,10 +257,16 @@ class Ui_search(object):
                 self.pagenum = int(self.pagenumDownList.currentText())
         except ValueError:
             QtWidgets.QMessageBox.warning(self.excelButton, "提示", "亲, 输入页码格式不对哦！")
+            return
+        editDirpath = self.saveFileEdit.toPlainText()
+        if len(editDirpath.strip()) > 0:
+            if os.path.isdir(editDirpath):
+                self.dir_path = editDirpath
+            else:
+                QtWidgets.QMessageBox.warning(self.excelButton, "提示", "亲, 您输入的不是一个文件目录哦！"
+                                                                      "如果你嫌麻烦可以不填写，默认路径为" + self.dir_path)
+                return
 
-    def generateExcel(self):
-        self.generateSearchClass()
-        self.completeSearchParams()
         if self.search_class['pc_baidu'] == 0 and self.search_class['pc_360'] == 0 \
                 and self.search_class['pc_sogou'] == 0 \
                 and self.search_class['m_baidu'] == 0 and self.search_class['m_360'] == 0 \
@@ -258,7 +278,7 @@ class Ui_search(object):
             return
         else:
             self.keyword_list = self.keyword.split(',|，')
-        from uipy.CrawlerThread import CrawlerHandler
+        from uipy.crawlerthread import CrawlerHandler
         self.crawler_process = CrawlerHandler()
         # 登陆完成的信号绑定到登陆结束的槽函数
         self.crawler_process.finishSignal.connect(self.finishCrawler)
@@ -290,10 +310,11 @@ class Ui_search(object):
         self.pagenumDownList.setItemText(10, _translate("search", "100"))
         self.pagenumDownList.setItemText(11, _translate("search", "200"))
         self.excelButton.setText(_translate("search", "生成excel表格"))
-        self.saveFileLabel.setText(_translate("search", "保存路径:"))
-        self.isClassLabel.setText(_translate("search", "是否分类"))
-        self.classYesCheckbox.setText(_translate("search", "是"))
-        self.classNoCheckbox.setText(_translate("search", "否"))
+        self.saveFileLabel.setText(_translate("search", "保存路径: "))
+        self.saveFileNameLabel.setText(_translate("search", "保存文件名: "))
+        # self.isClassLabel.setText(_translate("search", "是否分类"))
+        # self.classYesCheckbox.setText(_translate("search", "是"))
+        # self.classNoCheckbox.setText(_translate("search", "否"))
         self.pcBaiduCheckbox.setText(_translate("search", "百度"))
         self.pc360Checkbox.setText(_translate("search", "360"))
         self.pcSogouCheckbox.setText(_translate("search", "搜狗"))

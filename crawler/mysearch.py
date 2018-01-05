@@ -10,7 +10,7 @@ class MySearch(object):
     # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
     other_search_dit = {}
 
-    relate_search_list = []
+    relate_search_list = {}
 
     website_start_url = None
 
@@ -30,7 +30,7 @@ class MySearch(object):
     @staticmethod
     def get_content_whitget(url_path, encoding):
         headers = {"Accept": "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01",
-                   'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36",
+                   'User-Agent': "Mozilla 5.0 (Windows NT 10.0; Win32; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36",
                    "Accept-Language": "zh-CN,zh;q=0.9"
                    }
         res = requests.get(url_path, headers=headers)

@@ -123,13 +123,17 @@ class PcBaiduSearch(MySearch):
                     setattr(craw_item, 'content', content_desc_div.get_text())
                 else:
                     content_desc_div = content_div_item.find(attrs={'class': re.compile(".*(c-row).*")})
-                    setattr(craw_item, 'content', re.sub('[\r\n\t\b ]', '', content_desc_div.get_text()))
+                    if content_desc_div is not None:
+                        setattr(craw_item, 'content', re.sub('[\r\n\t\b ]', '', content_desc_div.get_text()))
+                    else:
+                        setattr(craw_item, 'content', re.sub('[\r\n\t\b ]', '', content_div_item.get_text()))
                 website_domain_div = content_div_item.find("div", attrs={'class': re.compile(".*f13.*")})
                 if website_domain_div is not None:
                     showurl_a = website_domain_div.find(attrs={'class': "c-showurl"})
                     if showurl_a is None:
                         showurl_a = website_domain_div.find("a")
-                    setattr(craw_item, 'domain', showurl_a.get_text())
+                    if showurl_a is not None:
+                        setattr(craw_item, 'domain', showurl_a.get_text())
                 else:
                     showurl_a = content_div_item.find_all("span", attrs={'class': "c-showurl"})[0]
                     setattr(craw_item, 'domain', showurl_a.get_text())

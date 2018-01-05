@@ -5,7 +5,6 @@ from crawler.mysearch import MySearch
 from file.crawleritem import CrawlerItem
 import re
 
-
 # http://m.sm.cn/s?q=%E9%85%B8%E5%A5%B6%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%96%9D%E6%AF%94%E8%BE%83%E5%A5%BD
 class MShenmaSearch(MySearch):
     # 搜索排名
@@ -17,7 +16,7 @@ class MShenmaSearch(MySearch):
     # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
     other_search_dit = {}
 
-    relate_search_list = []
+    relate_search_list = {}
 
     website_start_url = 'http://m.sm.cn'
 
@@ -49,14 +48,52 @@ class MShenmaSearch(MySearch):
             if self.relate_search_parseflag is False:
                 if relate_search_div is not None:
                     self.parse_relate_search(relate_search_div)
-                    self.relate_search_parseflag = True
             self.parse_result_page(parse_div)
 
     def parse_result_page(self, result):
-        pass
+        content_div_list = result.find_all("div", attrs={'class': 'article ali_row'})
+        if content_div_list is not None and len(content_div_list) > 0:
+            for content_div_item in content_div_list:
+                title_h2 = content_div_item.find("h2")
+                if title_h2 is not None:
+                    self.page_index += 1
+                    craw_item = CrawlerItem()
+                    setattr(craw_item, 'search', "移动端神马")
+                    setattr(craw_item, 'keyword', self.keyword)
+                    setattr(craw_item, 'index', self.page_index)
+                    setattr(craw_item, 'page', str(self.cur_parse_page))
+                    setattr(craw_item, 'title', title_h2.get_text().replace("\n", ""))
+                    setattr(craw_item, 'page_url', title_h2.find("a").get("href"))
+                    content_desc_p = result.find("p")
+                    if content_desc_p is not None:
+                        setattr(craw_item, 'content', content_desc_p.get_text())
+                    else:
+                        setattr(craw_item, 'content', content_div_item.get_text())
+                    down_link_div = result.find("div", attrs={'class': 'other'})
+                    if down_link_div is not None:
+                        setattr(craw_item, 'domain', down_link_div.get_text())
+                print(craw_item)
 
     def parse_relate_search(self, relate_div):
-        pass
+        print("正在解析移动端神马相关搜索.....................")
+        relate_ul = relate_div.find("ul")
+        if relate_ul is not None:
+            relate_search_a = relate_ul.find_all("a")
+            print("搜索到相关词条数目:", len(relate_search_a))
+            relate_result_list = []
+            for relate_search_item in relate_search_a:
+                single_dit = {}
+                single_dit['text'] = relate_search_item.get_text()
+                single_dit['url'] = self.website_start_url + relate_search_item.get("href")
+                relate_result_list.append(single_dit)
+                print(single_dit['text'], single_dit['url'])
+            self.relate_search_list[self.cur_parse_page] = relate_result_list
+            print(self.relate_search_list)
+        print("移动端神马相关搜索解析完毕.....................")
 
     def parse_other_search(self, result):
         pass
+
+
+test = MShenmaSearch("全名彩票", 10)
+test.genrate_pageurl()

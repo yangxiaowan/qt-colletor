@@ -118,9 +118,9 @@ class Pc360Search(MySearch):
                 if res_linkinfo_p is not None:
                     linkinfo = res_linkinfo_p.find("cite").get_text()
                 else:
-                    temp_url = res_list_item.find(attrs={"class": "mh-showurl"}).find("cite")
+                    temp_url = res_list_item.find(attrs={"class": "mh-showurl"})
                     if temp_url is not None:
-                        linkinfo = temp_url.get_text()
+                        linkinfo = temp_url.find("cite").get_text()
                 setattr(craw_item, 'domain', linkinfo)
                 setattr(craw_item, 'index', self.page_index)
                 print(craw_item)

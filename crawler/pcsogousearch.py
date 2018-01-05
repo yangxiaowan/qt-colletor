@@ -55,10 +55,11 @@ class PcSogouSearch(MySearch):
             print("************************************************************", other_search_div)
             if other_search_div is not None:
                 self.parse_other_search(other_search_div)
-            if self.relate_search_parseflag is False and self.recommend_search_index < 2:
+            if relate_search_div is not None and \
+                            self.relate_search_parseflag is False and self.recommend_search_index < 2:
                 self.recommend_search_index += 1
                 self.parse_relate_search(relate_search_div)
-            self.parse_result_page(content_div)
+                # self.parse_result_page(content_div)
 
     def parse_relate_search(self, relate_div):
         print("正在解析搜狗相关搜索.....................")
@@ -133,7 +134,6 @@ class PcSogouSearch(MySearch):
                 if str_pd_box is not None:
                     start_box_item_start = str_pd_box.find("p", attrs={'class': 'str_time'})
                     if start_box_item_start is not None:
-                        print("______________________________________________________")
                         craw_box_item = CrawlerItem()
                         setattr(craw_box_item, 'title', start_box_item_start.get_text().replace('\n', ''))
                         setattr(craw_box_item, 'page', start_box_item_start.find("a").get("href").replace('\n', ''))
