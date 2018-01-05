@@ -1,7 +1,8 @@
 # author : YangWan
 # -*- coding: utf-8 -*-
 
-import threading, time, random
+import threading
+import time
 from crawler.pcbaidusearch import PcBaiduSearch
 from crawler.pc360search import Pc360Search
 from crawler.pcsogousearch import PcSogouSearch

@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 # Form implementation generated from reading ui file 'searchwin.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
-from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtWidgets import QProgressDialog
-from uipy.searchbar import ProgressBar
-import os
+
 
 class Ui_search(object):
 
@@ -278,7 +276,7 @@ class Ui_search(object):
             return
         else:
             self.keyword_list = self.keyword.split(',|，')
-        from uipy.crawlerthread import CrawlerHandler
+        from thread.crawlerthread import CrawlerHandler
         self.crawler_process = CrawlerHandler()
         # 登陆完成的信号绑定到登陆结束的槽函数
         self.crawler_process.finishSignal.connect(self.finishCrawler)
