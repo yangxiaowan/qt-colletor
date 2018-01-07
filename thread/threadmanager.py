@@ -5,6 +5,7 @@ import threading
 import time
 from queue import Queue
 from thread.crawlerparsethread import CrawlerParseThread
+from thread.writeexcelthread import WriteExcelThread
 
 '''
 负责爬虫调度和多任务并发
@@ -22,17 +23,26 @@ class CrawlerManager():
 
     product_queue = Queue()
 
-    def __init__(self, search_class, keyword_list, page_num=5, dir_path='C:\colletor-result', file_name=None):
+    excel_thread = None
+
+    def __init__(self, search_class, keyword_list, page_num=5, dir_path='', file_name='result.xlsx'):
         self.search_class = search_class
         self.keyword_list = keyword_list
         self.page_num = page_num
         self.dir_path = dir_path
         self.file_name = file_name
 
+    #启动写excel进程
+    def start_write_excel_thread(self, thread_num):
+        self.excel_thread = WriteExcelThread(self.cond, self.product_queue, thread_num, self.dir_path, self.file_name)
+        self.excel_thread.write_for_ready()
+        self.excel_thread.start()
+
     '''
        为每个搜索引擎爬虫创建单独的线程，以免某个搜索的http请求延迟太久影响效率
     '''
     def create_thread_for_crawler(self):
+
         for key_item in self.search_class.keys():
             # 字典中元素为1的才会分配线程
             if self.search_class[key_item] == 1:
@@ -53,12 +63,16 @@ class CrawlerManager():
                             # 启动分页爬虫
                             crawler_thread.start()
                             self.thread_list.append(crawler_thread)
+        self.start_write_excel_thread(len(self.thread_list))
 
     def wait_all_thread_finish(self):
-        time.sleep(1)
+        time.sleep(2)
         #主线程睡眠1秒，保证所有的爬虫线程都已经启动了
         for thread_item in self.thread_list:
             thread_item.join()
+        if self.excel_thread is not None:
+            self.excel_thread.join()
+            self.excel_thread.save_excel()
 
 
 search_class = {

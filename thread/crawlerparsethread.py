@@ -39,24 +39,24 @@ class CrawlerParseThread(threading.Thread):
     def run(self):
         super().run()
         if self.search_name == 'pc_baidu':
-            self.productitem = PcBaiduSearch(self.keyword, self.start_index, self.end_index).get_product_item()
+            self.product_item = PcBaiduSearch(self.keyword, self.start_index, self.end_index).get_product_item()
         elif self.search_name == 'pc_360':
-            self.productitem = Pc360Search(self.keyword, self.start_index, self.end_index).get_product_item()
+            self.product_item = Pc360Search(self.keyword, self.start_index, self.end_index).get_product_item()
         elif self.search_name == 'pc_sogou':
-            self.productitem = PcSogouSearch(self.keyword, self.start_index, self.end_index).get_product_item()
+            self.product_item = PcSogouSearch(self.keyword, self.start_index, self.end_index).get_product_item()
         elif self.search_name == 'm_baidu':
-            self.productitem = MBaiduSearch(self.keyword, self.start_index, self.end_index).get_product_item()
+            self.product_item = MBaiduSearch(self.keyword, self.start_index, self.end_index).get_product_item()
         elif self.search_name == 'm_360':
-            self.productitem = M360Search(self.keyword, self.start_index, self.end_index).get_product_item()
+            self.product_item = M360Search(self.keyword, self.start_index, self.end_index).get_product_item()
         elif self.search_name == 'm_sogou':
-            self.productitem = MSogouSearch(self.keyword, self.start_index, self.end_index).get_product_item()
+            self.product_item = MSogouSearch(self.keyword, self.start_index, self.end_index).get_product_item()
         elif self.search_name == 'm_shenma':
-            self.productitem = MShenmaSearch(self.keyword, self.start_index, self.end_index).get_product_item()
+            self.product_item = MShenmaSearch(self.keyword, self.start_index, self.end_index).get_product_item()
         self.condition.acquire()
         if self.product_queue.qsize() > 10:
             self.condition.wait()
-        else:
-            self.product_queue.put(self.product_item)
+        self.product_queue.put(self.product_item)
+        self.condition.notify()
         self.condition.release()
         print("当前生产队列未写入爬取数据个数: " + str(self.product_queue.qsize()))
 
