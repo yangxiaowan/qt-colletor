@@ -81,7 +81,7 @@ search_class = {
 }
 keyword_list = ['全民彩票']
 start = time.time()
-crawlermanager = CrawlerManager(search_class, keyword_list, 2)
+crawlermanager = CrawlerManager(search_class, keyword_list, 11)
 crawlermanager.create_thread_for_crawler()
 crawlermanager.wait_all_thread_finish()
 end = time.time()

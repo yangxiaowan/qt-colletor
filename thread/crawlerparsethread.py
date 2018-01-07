@@ -14,6 +14,9 @@ from file.productitem import ProductItem
 
 
 class CrawlerParseThread(threading.Thread):
+
+    max_queue_deep = 11
+
     product_item = None
     '''
     初始化爬虫线程
@@ -53,7 +56,7 @@ class CrawlerParseThread(threading.Thread):
         elif self.search_name == 'm_shenma':
             self.product_item = MShenmaSearch(self.keyword, self.start_index, self.end_index).get_product_item()
         self.condition.acquire()
-        if self.product_queue.qsize() > 10:
+        if self.product_queue.qsize() > self.max_queue_deep:
             self.condition.wait()
         self.product_queue.put(self.product_item)
         self.condition.notify()

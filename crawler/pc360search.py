@@ -126,5 +126,5 @@ class Pc360Search(MySearch):
                 print(craw_item)
         print("解析360页面结束......................")
 
-# test = Pc360Search("360彩票", 1, 3, 10)
+# test = Pc360Search("全民彩票", 10, 10, 10)
 # test.genrate_pageurl()

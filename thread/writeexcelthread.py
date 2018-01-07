@@ -98,21 +98,20 @@ class WriteExcelThread(Thread):
             self.condition.acquire()
             # 如果队列不为空，则从里面取出生产对象
             if self.product_queue.empty() is True:
-                print("!!!**********************************************************"
-                      + str(self.product_queue.qsize()))
                 # 如果队列为空，写excel线程挂起
                 self.condition.wait()
             # 从队头删除并返回一个生产对象
             product_item = self.product_queue.get()
-            self.write_product_to_excel(product_item)
-            self.cur_wirte_index += 1
+            if product_item is not None:
+                self.write_product_to_excel(product_item)
+                self.cur_wirte_index += 1
             self.condition.release()
             if self.cur_wirte_index == self.thread_num:
                 break
 
 # cond = threading.Condition()
 # q = Queue()
-# crawler_test = PcBaiduSearch("全名彩票", 1, 1, 5)
+# crawler_test = PcBaiduSearch("全民彩票", 1, 1, 5)
 # q.put(crawler_test.get_product_item())
 # test = WriteExcelThread(cond, q)
 # test.write_for_ready()

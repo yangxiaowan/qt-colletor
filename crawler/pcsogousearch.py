@@ -148,5 +148,5 @@ class PcSogouSearch(MySearch):
         print("搜索到网站词条数目为:", len(content_div_list))
         print("解析搜狗网站词条内容结束.....................")
 
-# test = PcSogouSearch("saf", 1, 2)
+# test = PcSogouSearch("全民彩票", 10, 10)
 # test.genrate_pageurl()

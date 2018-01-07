@@ -151,6 +151,5 @@ class PcBaiduSearch(MySearch):
                         self.content_parse_list.append(craw_other_item)
                 print(craw_item)
 
-# test = PcBaiduSearch("全名彩票", 1, 1, 5)
+# test = PcBaiduSearch("全民彩票", 10, 10, 5)
 # test.genrate_pageurl()
-# print(getattr(test.get_product_item(), 'crawler_list'))
