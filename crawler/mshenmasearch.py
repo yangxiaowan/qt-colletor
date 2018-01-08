@@ -44,9 +44,8 @@ class MShenmaSearch(MySearch):
             # 定位到相关搜索
             relate_search_div = parse_div.find("div", attrs={'class': 'ali_rel'})
             # 相关搜索的解析
-            if self.relate_search_parseflag is False:
-                if relate_search_div is not None:
-                    self.parse_relate_search(relate_search_div)
+            if relate_search_div is not None:
+                self.parse_relate_search(relate_search_div)
             self.parse_result_page(parse_div)
             self.product_item = ProductItem(self.content_parse_list, self.relate_search_list, self.other_search_dit)
 
@@ -59,7 +58,7 @@ class MShenmaSearch(MySearch):
                     self.page_index += 1
                     craw_item = CrawlerItem()
                     setattr(craw_item, 'search', "移动端神马")
-                    setattr(craw_item, 'relate_search', 0)
+                    setattr(craw_item, 'relate_search', self.cur_parse_page)
                     setattr(craw_item, 'keyword', self.keyword)
                     setattr(craw_item, 'index', self.page_index)
                     setattr(craw_item, 'page', str(self.cur_parse_page))
@@ -85,6 +84,7 @@ class MShenmaSearch(MySearch):
             relate_str = ''
             item_index = 0
             for relate_search_item in relate_search_a:
+                item_index += 1
                 text = relate_search_item.get_text()
                 url = self.website_start_url + relate_search_item.get("href")
                 relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
@@ -95,5 +95,5 @@ class MShenmaSearch(MySearch):
     def parse_other_search(self, result):
         pass
 
-# test = MShenmaSearch("全名彩票", 1, 1)
+# test = MShenmaSearch("全名彩票", 1, 2)
 # test.genrate_pageurl()
