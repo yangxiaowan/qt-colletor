@@ -1,7 +1,7 @@
 # author : YangWan
 import requests
 import random
-from file.productitem import ProductItem
+from selenium import webdriver
 class MySearch(object):
     # 开始解析页面
     start_parse_index = None
@@ -34,6 +34,8 @@ class MySearch(object):
     recommend_search_parseflag = False
 
     product_item = None
+
+    # driver = webdriver.Chrome(executable_path="C:\\Users\\yangwan\\PycharmProjects\\qt-colletor\\build\\setup\\chromedriver.exe")
 
     def __init__(self, keyword, start_parse_index=None, end_parse_index=None, pagenum=None):
         self.keyword = keyword

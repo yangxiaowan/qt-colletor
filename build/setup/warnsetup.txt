@@ -5,7 +5,7 @@ missing module named org - imported by pickle, C:\Users\yangwan\PycharmProjects\
 missing module named readline - imported by cmd, code, pdb, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
 excluded module named _frozen_importlib - imported by importlib, importlib.abc, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
 missing module named _frozen_importlib_external - imported by importlib._bootstrap, importlib, importlib.abc, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
-missing module named _winreg - imported by platform, requests.utils, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
+missing module named _winreg - imported by platform, requests.utils, selenium.webdriver.firefox.firefox_binary, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
 missing module named _scproxy - imported by urllib.request
 missing module named java - imported by platform, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
 missing module named 'java.lang' - imported by platform, xml.sax._exceptions, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
@@ -24,15 +24,18 @@ missing module named grp - imported by shutil, tarfile, C:\Users\yangwan\Pycharm
 missing module named pwd - imported by posixpath, shutil, tarfile, http.server, webbrowser, netrc, getpass, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
 missing module named _dummy_threading - imported by dummy_threading, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
 missing module named 'org.python' - imported by copy, xml.sax, C:\Users\yangwan\PycharmProjects\qt-colletor\setup.py
+missing module named thread.get_ident - imported by thread, urllib3.packages.ordered_dict
+missing module named urllib2 - imported by requests.compat, selenium.webdriver.common.utils, selenium.webdriver.remote.remote_connection, selenium.webdriver.common.service
+missing module named StringIO - imported by six, urllib3.packages.six, requests.compat, selenium.webdriver.remote.webelement
+missing module named urlparse - imported by requests.compat, selenium.webdriver.remote.remote_connection
+missing module named httplib - imported by selenium.webdriver.firefox.webdriver, selenium.webdriver.remote.remote_connection, selenium.webdriver.safari.webdriver, selenium.webdriver.blackberry.webdriver, selenium.webdriver.webkitgtk.webdriver
+missing module named cStringIO - imported by selenium.webdriver.firefox.firefox_profile
+missing module named copy_reg - imported by cStringIO
 missing module named backports - imported by urllib3.packages.ssl_match_hostname
 missing module named _abcoll - imported by urllib3.packages.ordered_dict
 missing module named dummy_thread - imported by urllib3.packages.ordered_dict
-missing module named thread - imported by urllib3.packages.ordered_dict
-missing module named StringIO - imported by six, urllib3.packages.six, requests.compat
 missing module named Cookie - imported by requests.compat
 missing module named cookielib - imported by requests.compat
-missing module named urllib2 - imported by requests.compat
-missing module named urlparse - imported by requests.compat
 missing module named simplejson - imported by requests.compat
 missing module named Queue - imported by urllib3.connectionpool
 missing module named "'urllib3.packages.six.moves.urllib'.parse" - imported by urllib3.request, urllib3.poolmanager

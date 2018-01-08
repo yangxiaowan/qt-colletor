@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 
 # Form implementation generated from reading ui file 'searchwin.ui'
 #
@@ -23,9 +24,9 @@ class Ui_search(object):
 
     pagenum = 1
 
-    dir_path = 'C:\colletor-result'
+    dir_path = ''
 
-    file_name = ''
+    file_name = 'results.xls'
 
     def setupUi(self, search):
         search.setObjectName("search")
@@ -276,16 +277,27 @@ class Ui_search(object):
             return
         else:
             self.keyword_list = self.keyword.split(',|，')
+        editFileName = self.saveFileNameEdit.toPlainText()
+        if len(editFileName.strip()) > 0:
+            pattern = re.compile(r".*(.xls)$")
+            if pattern.match(editFileName):
+                self.file_name = editFileName
+            else:
+                QtWidgets.QMessageBox.information(self.excelButton, "提示", "亲, 文件格式不对!")
+                return
         from thread.guithread import CrawlerHandler
-        self.crawler_process = CrawlerHandler()
+        self.excelButton.setDisabled(True)
+        self.crawler_process = CrawlerHandler(self.search_class,
+                                              self.keyword_list,
+                                              self.pagenum,
+                                              self.dir_path,
+                                              self.file_name)
         # 登陆完成的信号绑定到登陆结束的槽函数
         self.crawler_process.finishSignal.connect(self.finishCrawler)
         # 启动线程
         self.crawler_process.start()
 
-    def finishCrawler(self, words):
-        for i in words:
-            print(i)
+    def finishCrawler(self, message):
         QtWidgets.QMessageBox.information(self.excelButton, "提示", "爬取任务完成，快去查看你的excel文件吧!")
 
     def retranslateUi(self, search):

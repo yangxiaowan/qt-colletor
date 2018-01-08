@@ -5,11 +5,13 @@ from crawler.mysearch import MySearch
 from file.crawleritem import CrawlerItem
 from file.productitem import ProductItem
 import re
+import time
 
 '''
 百度网页爬虫
 '''
 class PcBaiduSearch(MySearch):
+
     # 搜索排名
     page_index = 0
 
@@ -24,6 +26,9 @@ class PcBaiduSearch(MySearch):
     website_start_url = 'https://www.baidu.com'
 
     domain_url = 'https://www.baidu.com/s?wd='
+
+    # 网站词条解析数组
+    content_parse_list = []
 
     #是否进行了相关搜索的解析
     relate_search_parseflag = False
@@ -46,14 +51,16 @@ class PcBaiduSearch(MySearch):
             #搜索具体内容div
             content_div = parse_div.find(id='content_left')
             #搜索到的推荐搜索div
-            other_search_div = beautiful_soup.find(attrs={'class': 'hint_toprq_tips f13 se_common_hint'})
+            other_search_div = beautiful_soup.find(attrs={'class': 'headBlock'})
             #定位到相关搜索
             relate_search_div = parse_div.find(id='rs')
             if self.recommend_search_parseflag is False:
+                print(other_search_div)
                 if other_search_div is not None:
                     self.parse_other_search(other_search_div)
             if self.relate_search_parseflag is False:
-                self.parse_relate_search(relate_search_div)
+                if relate_search_div is not None:
+                    self.parse_relate_search(relate_search_div)
             self.parse_result_page(content_div)
             # 获得生成对象，在接下来的get_product_item方法时会返回生产对象
             self.product_item = ProductItem(self.content_parse_list, self.relate_search_list, self.other_search_dit)
@@ -68,16 +75,19 @@ class PcBaiduSearch(MySearch):
         if relate_table is not None:
             relate_search_th = relate_table.find_all("th")
             print("搜索到相关词条数目:", len(relate_search_th))
-            relate_result_list = []
+            relate_str = ''
+            item_index = 0
             for relate_search_item in relate_search_th:
-                single_dit = {}
-                single_dit['text'] = relate_search_item.find("a").string
-                single_dit['url'] = self.website_start_url + relate_search_item.find("a").get("href")
-                relate_result_list.append(single_dit)
-                print(single_dit['text'], single_dit['url'])
-            self.relate_search_list[1] = relate_result_list
+                item_index += 1
+                text = relate_search_item.find("a").get_text()
+                url = self.website_start_url + relate_search_item.find("a").get("href")
+                relate_str += '序号: %d ,  词条: %s ,  || ' % \
+                              (item_index, text)
+            self.relate_search_list[0] = relate_str
+            print(relate_str)
             print(self.relate_search_list)
         print("百度相关搜索解析完毕.....................")
+
 
     '''
         推荐搜索解析，只需解析一次,其他页面的推荐搜索是相同的
@@ -115,8 +125,10 @@ class PcBaiduSearch(MySearch):
                     setattr(craw_item, 'keyword', self.keyword)
                     setattr(craw_item, 'title', content_titlea.get_text())
                     setattr(craw_item, 'page_url', content_titlea.get("href"))
-                    setattr(craw_item, 'index', self.page_index)
+                    setattr(craw_item, 'index', int(content_div_item.get("id")))
                     setattr(craw_item, 'page', str(self.cur_parse_page))
+                    # 百度的所有相关搜索都是一样的，直接填默认值0
+                    setattr(craw_item, 'relate_search', 0)
                 content_desc_div = content_div_item.find("div", attrs={'class': re.compile(".*(c-abstract).*")})
                 if content_desc_div is not None:
                     setattr(craw_item, 'content', content_desc_div.get_text())
@@ -134,8 +146,9 @@ class PcBaiduSearch(MySearch):
                     if showurl_a is not None:
                         setattr(craw_item, 'domain', showurl_a.get_text())
                 else:
-                    showurl_a = content_div_item.find_all("span", attrs={'class': "c-showurl"})[0]
-                    setattr(craw_item, 'domain', showurl_a.get_text())
+                    showurl_a = content_div_item.find_all("span", attrs={'class': "c-showurl"})
+                    if len(showurl_a) > 0:
+                        setattr(craw_item, 'domain', showurl_a[0].get_text())
                 offset_div = content_div_item.find("div", attrs={'class': "c-offset"})
                 # 将解析词条加入数列
                 self.content_parse_list.append(craw_item)
@@ -151,5 +164,5 @@ class PcBaiduSearch(MySearch):
                         self.content_parse_list.append(craw_other_item)
                 print(craw_item)
 
-# test = PcBaiduSearch("全民彩票", 10, 10, 5)
+# test = PcBaiduSearch("全民彩票", 1, 10, 5)
 # test.genrate_pageurl()

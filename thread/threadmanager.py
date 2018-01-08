@@ -17,7 +17,7 @@ class CrawlerManager():
     thread_list = []
 
     # 分配线程的步长
-    step_len = 5
+    step_len = 5000
 
     cond = threading.Condition()
 
@@ -25,7 +25,7 @@ class CrawlerManager():
 
     excel_thread = None
 
-    def __init__(self, search_class, keyword_list, page_num=5, dir_path='', file_name='result.xlsx'):
+    def __init__(self, search_class, keyword_list, page_num=5, dir_path='', file_name='results.xls'):
         self.search_class = search_class
         self.keyword_list = keyword_list
         self.page_num = page_num
@@ -56,34 +56,36 @@ class CrawlerManager():
                                                                 page_index + self.step_len)
                         else:
                             # 如果起始页码大于终止页码，则不分配线程
-                            if page_index <= self.page_num:
+                            if page_index < self.page_num:
                                 crawler_thread = CrawlerParseThread(self.cond, self.product_queue, key_item,
                                                                     keyword_item, page_index + 1, self.page_num)
+                            else:
+                                continue
                         if crawler_thread is not None:
                             # 启动分页爬虫
                             crawler_thread.start()
                             self.thread_list.append(crawler_thread)
+        print("当前爬虫线程个数:" + str(len(self.thread_list)))
         self.start_write_excel_thread(len(self.thread_list))
 
     def wait_all_thread_finish(self):
         time.sleep(2)
-        #主线程睡眠1秒，保证所有的爬虫线程都已经启动了
+        # 主线程睡眠2秒，保证所有的爬虫线程都已经启动了
         for thread_item in self.thread_list:
             thread_item.join()
         if self.excel_thread is not None:
             self.excel_thread.join()
             self.excel_thread.save_excel()
 
-
-search_class = {
-    'pc_baidu': 1, 'pc_360': 1, 'pc_sogou': 1,
-    'm_baidu': 0, 'm_360': 0, 'm_sogou': 0, 'm_shenma': 0
-}
-keyword_list = ['全民彩票']
-start = time.time()
-crawlermanager = CrawlerManager(search_class, keyword_list, 11)
-crawlermanager.create_thread_for_crawler()
-crawlermanager.wait_all_thread_finish()
-end = time.time()
-print("———————————————————————运行用时———————————————————————")
-print(end - start)
+# search_class = {
+#     'pc_baidu': 1, 'pc_360': 1, 'pc_sogou': 1,
+#     'm_baidu': 1, 'm_360': 1, 'm_sogou': 1, 'm_shenma': 1
+# }
+# keyword_list = ['全民彩票']
+# start = time.time()
+# crawlermanager = CrawlerManager(search_class, keyword_list, 10)
+# crawlermanager.create_thread_for_crawler()
+# crawlermanager.wait_all_thread_finish()
+# end = time.time()
+# print("———————————————————————运行用时———————————————————————")
+# print(end - start)

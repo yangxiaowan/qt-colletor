@@ -23,6 +23,9 @@ class MSogouSearch(MySearch):
 
     relate_search_list = {}
 
+    # 网站词条解析数组
+    content_parse_list = []
+
     website_start_url = 'https://wap.sogou.com/web/searchList.jsp'
 
     domain_url = 'https://wap.sogou.com/web/searchList.jsp?keyword='
@@ -32,10 +35,6 @@ class MSogouSearch(MySearch):
 
     # 是否进行推荐搜索的解析
     recommend_search_parseflag = False
-
-    def __init__(self, keyword, pagenum):
-        self.keyword = keyword
-        self.pagenum = pagenum
 
     def genrate_pageurl(self):
         super().genrate_pageurl()
@@ -77,14 +76,14 @@ class MSogouSearch(MySearch):
         if relate_rw_list is not None:
             relate_search_a = relate_rw_list.find_all("a")
             print("搜索到相关词条数目:", len(relate_search_a))
-            relate_result_list = []
+            relate_str = ''
+            item_index = 0
             for relate_search_aitem in relate_search_a:
-                single_dit = {}
-                single_dit['text'] = relate_search_aitem.get_text()
-                single_dit['url'] = self.website_start_url + relate_search_aitem.get("href")
-                relate_result_list.append(single_dit)
-                print(single_dit['text'], single_dit['url'])
-            self.relate_search_list[1] = relate_result_list
+                item_index += 1
+                text = relate_search_aitem.get_text()
+                url = self.website_start_url + relate_search_aitem.get("href")
+                relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+            self.relate_search_list[0] = relate_str
             print(self.relate_search_list)
         print("移动端搜狗相关搜索解析完毕.....................")
 
@@ -127,6 +126,7 @@ class MSogouSearch(MySearch):
                         craw_item = CrawlerItem()
                         self.page_index += 1
                         setattr(craw_item, 'search', "移动端搜狗")
+                        setattr(craw_item, 'relate_search', 0)
                         setattr(craw_item, 'keyword', self.keyword)
                         setattr(craw_item, 'title', re.sub('[\r\n\t\b ]', '', content_title.get_text()))
                         content_title_a = content_title.find("a")
@@ -149,5 +149,5 @@ class MSogouSearch(MySearch):
                         self.content_parse_list.append(craw_item)
                         print(craw_item)
 
-# test = MSogouSearch("全名彩票", 1)
+# test = MSogouSearch("全名彩票", 1, 1)
 # test.genrate_pageurl()

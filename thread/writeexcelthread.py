@@ -5,7 +5,6 @@ from queue import Queue
 from threading import Thread
 from crawler.pcbaidusearch import PcBaiduSearch
 import xlwt
-
 class WriteExcelThread(Thread):
 
     column_num = 10
@@ -14,6 +13,11 @@ class WriteExcelThread(Thread):
     '''
     execl_headers = ['搜索引擎', '关键字', '页码', '排名', '网站标题',
                      '网站简介', '网站链接', '网站标识', '相关搜索', '其他搜索']
+
+    # global_rank_index = {
+    # 'PC端百度': 0, 'PC端360': 0, 'PC端搜狗': 0,
+    # '移动端百度': 0, '移动端360': 0, '移动端搜狗': 0, '移动端神马': 0
+    # }
 
     result_sheet = None
 
@@ -25,7 +29,7 @@ class WriteExcelThread(Thread):
     #当前写入生产线程序号
     cur_wirte_index = 0
 
-    def __init__(self, con, product_queue, thread_num, file_name='result.xlsx', dir_path=''):
+    def __init__(self, con, product_queue, thread_num, file_name='result.xls', dir_path=''):
         super(WriteExcelThread, self).__init__()
         self.condition = con
         self.product_queue = product_queue
@@ -75,9 +79,12 @@ class WriteExcelThread(Thread):
         self.work_book.save(self.dir_path + self.file_name)
         print("Info： save the excel successfully!!!")
 
+
     def write_product_to_excel(self, product_item):
         print("Info： write the crawleritem to excel!!! GODD!!!!!!!")
         if self.work_book is not None:
+            relate_search_dit = getattr(product_item, 'relate_dit')
+            other_search_dit = getattr(product_item, 'other_dit')
             crawler_list = getattr(product_item, 'crawler_list')
             if crawler_list is not None and len(crawler_list) > 0:
                 for crawler_item in crawler_list:
@@ -89,6 +96,10 @@ class WriteExcelThread(Thread):
                     self.result_sheet.write(self.write_cur_row, 5, getattr(crawler_item, 'content'))
                     self.result_sheet.write(self.write_cur_row, 6, getattr(crawler_item, 'page_url'))
                     self.result_sheet.write(self.write_cur_row, 7, getattr(crawler_item, 'domain'))
+                    # 相关推荐的写入
+                    relate_search_key = getattr(crawler_item, 'relate_search')
+                    if relate_search_key in relate_search_dit.keys():
+                        self.result_sheet.write(self.write_cur_row, 8, relate_search_dit[relate_search_key])
                     # self.result_sheet.write(self.write_cur_row, 8, getattr(crawler_item, 'relate_search'))
                     # self.result_sheet.write(self.write_cur_row, 9, getattr(crawler_item, 'other_search'))
                     self.write_cur_row += 1
@@ -100,6 +111,7 @@ class WriteExcelThread(Thread):
             if self.product_queue.empty() is True:
                 # 如果队列为空，写excel线程挂起
                 self.condition.wait()
+                self.condition.notify()
             # 从队头删除并返回一个生产对象
             product_item = self.product_queue.get()
             if product_item is not None:

@@ -34,6 +34,9 @@ class Pc360Search(MySearch):
 
     recommend_search_index = 0
 
+    # 网站词条解析数组
+    content_parse_list = []
+
     def genrate_pageurl(self):
         super().genrate_pageurl()
         self.cur_parse_page = self.start_parse_index - 1
@@ -69,8 +72,8 @@ class Pc360Search(MySearch):
             single_search_dit['text'] = every_search_aitem.get_text()
             single_search_dit['url'] = self.website_start_url + every_search_aitem.get("href")
             every_search_list.append(single_search_dit)
-        self.relate_search_list['为您推荐'] = every_search_list
-        print(self.relate_search_list)
+        self.other_search_dit['为您推荐'] = every_search_list
+        print(self.other_search_dit)
         print("解析360为您推荐结束.....................")
 
     def parse_relate_search(self, relate_div):
@@ -78,13 +81,14 @@ class Pc360Search(MySearch):
         data_table = relate_div.find("table")
         if data_table is not None:
             every_search_a = data_table.find_all("a")
-            every_search_list = []
+            relate_str = ''
+            item_index = 0
             for every_search_aitem in every_search_a:
-                single_search_dit = {}
-                single_search_dit['text'] = every_search_aitem.get_text()
-                single_search_dit['url'] = self.website_start_url + every_search_aitem.get("href")
-                every_search_list.append(single_search_dit)
-            self.relate_search_list[1] = every_search_list
+                item_index += 1
+                text = every_search_aitem.get_text()
+                url = self.website_start_url + every_search_aitem.get("href")
+                relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+            self.relate_search_list[0] = relate_str
         print(self.relate_search_list)
         print("解析360相关搜索结束......................")
 
@@ -101,6 +105,7 @@ class Pc360Search(MySearch):
                 setattr(craw_item, 'keyword', self.keyword)
                 setattr(craw_item, 'index', self.page_index)
                 setattr(craw_item, 'page', str(self.cur_parse_page))
+                setattr(craw_item, 'relate_search', 0)
                 res_list_h3_a = res_list_h3.find("a")
                 if res_list_h3_a is not None:
                     setattr(craw_item, 'title', res_list_h3_a.get_text().replace("\n", ""))

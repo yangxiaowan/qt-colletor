@@ -27,9 +27,8 @@ class MShenmaSearch(MySearch):
     # 是否进行推荐搜索的解析
     recommend_search_parseflag = False
 
-    def __init__(self, keyword, pagenum):
-        self.keyword = keyword
-        self.pagenum = pagenum
+    # 网站词条解析数组
+    content_parse_list = []
 
     def genrate_pageurl(self):
         super().genrate_pageurl()
@@ -60,6 +59,7 @@ class MShenmaSearch(MySearch):
                     self.page_index += 1
                     craw_item = CrawlerItem()
                     setattr(craw_item, 'search', "移动端神马")
+                    setattr(craw_item, 'relate_search', 0)
                     setattr(craw_item, 'keyword', self.keyword)
                     setattr(craw_item, 'index', self.page_index)
                     setattr(craw_item, 'page', str(self.cur_parse_page))
@@ -82,19 +82,18 @@ class MShenmaSearch(MySearch):
         if relate_ul is not None:
             relate_search_a = relate_ul.find_all("a")
             print("搜索到相关词条数目:", len(relate_search_a))
-            relate_result_list = []
+            relate_str = ''
+            item_index = 0
             for relate_search_item in relate_search_a:
-                single_dit = {}
-                single_dit['text'] = relate_search_item.get_text()
-                single_dit['url'] = self.website_start_url + relate_search_item.get("href")
-                relate_result_list.append(single_dit)
-                print(single_dit['text'], single_dit['url'])
-            self.relate_search_list[self.cur_parse_page] = relate_result_list
+                text = relate_search_item.get_text()
+                url = self.website_start_url + relate_search_item.get("href")
+                relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+            self.relate_search_list[self.cur_parse_page] = relate_str
             print(self.relate_search_list)
         print("移动端神马相关搜索解析完毕.....................")
 
     def parse_other_search(self, result):
         pass
 
-# test = MShenmaSearch("全名彩票", 10)
+# test = MShenmaSearch("全名彩票", 1, 1)
 # test.genrate_pageurl()

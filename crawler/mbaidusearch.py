@@ -33,9 +33,8 @@ class MBaiduSearch(MySearch):
     # 是否进行推荐搜索的解析
     recommend_search_parseflag = False
 
-    def __init__(self, keyword, pagenum):
-        self.keyword = keyword
-        self.pagenum = pagenum
+    # 网站词条解析数组
+    content_parse_list = []
 
     def genrate_pageurl(self):
         super().genrate_pageurl()
@@ -79,14 +78,14 @@ class MBaiduSearch(MySearch):
         if relate_rw_list is not None:
             relate_search_a = relate_rw_list.find_all("a")
             print("搜索到相关词条数目:", len(relate_search_a))
-            relate_result_list = []
+            relate_str = ''
+            item_index = 0
             for relate_search_aitem in relate_search_a:
-                single_dit = {}
-                single_dit['text'] = relate_search_aitem.get_text()
-                single_dit['url'] = relate_search_aitem.get("href")
-                relate_result_list.append(single_dit)
-                print(single_dit['text'], single_dit['url'])
-            self.relate_search_list[1] = relate_result_list
+                item_index += 1
+                text = relate_search_aitem.get_text()
+                url = relate_search_aitem.get("href")
+                relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+            self.relate_search_list[0] = relate_str
             print(self.relate_search_list)
         print("移动端百度相关搜索解析完毕.....................")
 
@@ -123,12 +122,13 @@ class MBaiduSearch(MySearch):
                 content_a = content_div_item.find("a", attrs={'class': 'c-blocka'})
                 if content_a is not None:
                     self.page_index += 1
-                    setattr(craw_item, 'search', "移动端端百度")
+                    setattr(craw_item, 'search', "移动端百度")
                     setattr(craw_item, 'keyword', self.keyword)
                     setattr(craw_item, 'title', content_a.get_text())
                     setattr(craw_item, 'page_url', content_a.get("href"))
                     setattr(craw_item, 'index', self.page_index)
                     setattr(craw_item, 'page', str(self.cur_parse_page))
+                    setattr(craw_item, 'relate_search', 0)
                     content_desc_p = content_div_item.find("p", attrs={'class': re.compile(".*(c-line).*")})
                     if content_desc_p is not None:
                         setattr(craw_item, 'content', content_desc_p.get_text())
@@ -154,5 +154,5 @@ class MBaiduSearch(MySearch):
                 self.content_parse_list.append(craw_item)
                 print(craw_item)
 
-# test = MBaiduSearch("捡到彩票中奖犯法吗", 4)
+# test = MBaiduSearch("捡到彩票中奖犯法吗", 11, 10)
 # test.genrate_pageurl()
