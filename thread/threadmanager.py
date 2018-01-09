@@ -31,6 +31,7 @@ class CrawlerManager():
         self.page_num = page_num
         self.dir_path = dir_path
         self.file_name = file_name
+        print("初始化线程管理-------> 搜索关键字: " + str(self.keyword_list) + "   搜索页面 : " + str(page_num))
 
     #启动写excel进程
     def start_write_excel_thread(self, thread_num):
@@ -78,12 +79,12 @@ class CrawlerManager():
             self.excel_thread.save_excel()
 
 # search_class = {
-#     'pc_baidu': 1, 'pc_360': 1, 'pc_sogou': 1,
-#     'm_baidu': 1, 'm_360': 1, 'm_sogou': 1, 'm_shenma': 1
+#     'pc_baidu': 1, 'pc_360': 0, 'pc_sogou': 0,
+#     'm_baidu': 0, 'm_360': 0, 'm_sogou': 0, 'm_shenma': 0
 # }
-# keyword_list = ['全民彩票']
+# keyword_list = ['全民彩票', '安稳']
 # start = time.time()
-# crawlermanager = CrawlerManager(search_class, keyword_list, 10)
+# crawlermanager = CrawlerManager(search_class, keyword_list, 1)
 # crawlermanager.create_thread_for_crawler()
 # crawlermanager.wait_all_thread_finish()
 # end = time.time()

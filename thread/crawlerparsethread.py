@@ -37,7 +37,7 @@ class CrawlerParseThread(threading.Thread):
         self.start_index = start_index
         self.end_index = end_index
         print("进程初始化完成!!! search_name: " + self.search_name + " start_index: " + str(
-            self.start_index) + " end_index: " + str(self.end_index))
+            self.start_index) + "  end_index: " + str(self.end_index))
 
     def run(self):
         super().run()

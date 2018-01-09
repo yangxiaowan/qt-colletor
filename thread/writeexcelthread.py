@@ -93,14 +93,17 @@ class WriteExcelThread(Thread):
                     self.result_sheet.write(self.write_cur_row, 2, getattr(crawler_item, 'page'))
                     self.result_sheet.write(self.write_cur_row, 3, getattr(crawler_item, 'index'))
                     self.result_sheet.write(self.write_cur_row, 4, getattr(crawler_item, 'title'))
-                    self.result_sheet.write(self.write_cur_row, 5, getattr(crawler_item, 'content'))
+                    title_str = getattr(crawler_item, 'content')
+                    if len(title_str) > 32767:
+                        title_str = title_str[0:32766]
+                    self.result_sheet.write(self.write_cur_row, 5, title_str)
                     self.result_sheet.write(self.write_cur_row, 6, getattr(crawler_item, 'page_url'))
                     self.result_sheet.write(self.write_cur_row, 7, getattr(crawler_item, 'domain'))
                     # 相关推荐的写入
                     relate_search_key = getattr(crawler_item, 'relate_search')
                     if relate_search_key in relate_search_dit.keys():
                         self.result_sheet.write(self.write_cur_row, 8, relate_search_dit[relate_search_key])
-                    # self.result_sheet.write(self.write_cur_row, 8, getattr(crawler_item, 'relate_search'))
+
                     # self.result_sheet.write(self.write_cur_row, 9, getattr(crawler_item, 'other_search'))
                     self.write_cur_row += 1
 

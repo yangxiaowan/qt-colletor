@@ -64,7 +64,7 @@ class MShenmaSearch(MySearch):
                     setattr(craw_item, 'page', str(self.cur_parse_page))
                     setattr(craw_item, 'title', title_h2.get_text().replace("\n", ""))
                     setattr(craw_item, 'page_url', title_h2.find("a").get("href"))
-                    content_desc_p = result.find("p")
+                    content_desc_p = content_div_item.find("p")
                     if content_desc_p is not None:
                         setattr(craw_item, 'content', content_desc_p.get_text())
                     else:
@@ -95,5 +95,6 @@ class MShenmaSearch(MySearch):
     def parse_other_search(self, result):
         pass
 
-# test = MShenmaSearch("全名彩票", 1, 2)
-# test.genrate_pageurl()
+
+test = MShenmaSearch("全名彩票", 1, 2)
+test.genrate_pageurl()

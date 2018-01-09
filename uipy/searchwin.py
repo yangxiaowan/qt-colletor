@@ -276,7 +276,9 @@ class Ui_search(object):
             QtWidgets.QMessageBox.information(self.excelButton, "提示", "亲, 请输入关键字，不然无法为您搜索!")
             return
         else:
-            self.keyword_list = self.keyword.split(',|，')
+            temp = str(self.keyword)
+            self.keyword_list = temp.split(',')
+            # QtWidgets.QMessageBox.information(self.excelButton, "提示", "分割" + str(self.keyword_list))
         editFileName = self.saveFileNameEdit.toPlainText()
         if len(editFileName.strip()) > 0:
             pattern = re.compile(r".*(.xls)$")
