@@ -301,6 +301,7 @@ class Ui_search(object):
 
     def finishCrawler(self, message):
         QtWidgets.QMessageBox.information(self.excelButton, "提示", "爬取任务完成，快去查看你的excel文件吧!")
+        self.excelButton.setDisabled(False)
 
     def retranslateUi(self, search):
         _translate = QtCore.QCoreApplication.translate
@@ -335,3 +336,10 @@ class Ui_search(object):
         self.mSogouCheckbox.setText(_translate("search", "搜狗"))
         self.mShenmaCheckbox.setText(_translate("search", "神马"))
 
+        self.pcBaiduCheckbox.setChecked(True)
+        self.pc360Checkbox.setChecked(True)
+        self.pcSogouCheckbox.setChecked(True)
+        self.mBaiduCheckbox.setChecked(True)
+        self.m360Checkbox.setChecked(True)
+        self.mSogouCheckbox.setChecked(True)
+        self.mShenmaCheckbox.setChecked(True)

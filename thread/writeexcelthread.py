@@ -11,8 +11,8 @@ class WriteExcelThread(Thread):
     '''
         解析Excel线程!!!
     '''
-    execl_headers = ['搜索引擎', '关键字', '页码', '排名', '网站标题',
-                     '网站简介', '网站链接', '网站标识', '相关搜索', '其他搜索']
+    execl_headers = ['搜索引擎', '关键字', '页码', '排名', '网站标识', '网站标题',
+                     '网站简介', '网站链接', '相关搜索', '其他搜索']
 
     # global_rank_index = {
     # 'PC端百度': 0, 'PC端360': 0, 'PC端搜狗': 0,
@@ -92,19 +92,29 @@ class WriteExcelThread(Thread):
                     self.result_sheet.write(self.write_cur_row, 1, getattr(crawler_item, 'keyword'))
                     self.result_sheet.write(self.write_cur_row, 2, getattr(crawler_item, 'page'))
                     self.result_sheet.write(self.write_cur_row, 3, getattr(crawler_item, 'index'))
-                    self.result_sheet.write(self.write_cur_row, 4, getattr(crawler_item, 'title'))
-                    title_str = getattr(crawler_item, 'content')
-                    if len(title_str) > 32767:
-                        title_str = title_str[0:32766]
-                    self.result_sheet.write(self.write_cur_row, 5, title_str)
-                    self.result_sheet.write(self.write_cur_row, 6, getattr(crawler_item, 'page_url'))
-                    self.result_sheet.write(self.write_cur_row, 7, getattr(crawler_item, 'domain'))
+                    self.result_sheet.write(self.write_cur_row, 4, getattr(crawler_item, 'domain'))
+                    self.result_sheet.write(self.write_cur_row, 5, getattr(crawler_item, 'title'))
+                    content_str = getattr(crawler_item, 'content')
+                    if content_str is not None and len(content_str) > 32767:
+                        content_str = content_str[0:32766]
+                    self.result_sheet.write(self.write_cur_row, 6, content_str)
+                    self.result_sheet.write(self.write_cur_row, 7, getattr(crawler_item, 'page_url'))
                     # 相关推荐的写入
                     relate_search_key = getattr(crawler_item, 'relate_search')
                     if relate_search_key in relate_search_dit.keys():
-                        self.result_sheet.write(self.write_cur_row, 8, relate_search_dit[relate_search_key])
+                        relate_str = relate_search_dit[relate_search_key]
+                        if relate_str is not None and len(relate_str) > 0:
+                            relate_str = relate_str[0:32766]
+                        self.result_sheet.write(self.write_cur_row, 8, relate_str)
 
-                    # self.result_sheet.write(self.write_cur_row, 9, getattr(crawler_item, 'other_search'))
+                    # 其他推荐的写入
+                    other_search_key = getattr(crawler_item, 'other_search')
+                    if other_search_key in other_search_dit.keys():
+                        other_str = other_search_dit[other_search_key]
+                        if len(other_str) > 0:
+                            other_str = other_str[0:32766]
+                        self.result_sheet.write(self.write_cur_row, 9, other_str)
+
                     self.write_cur_row += 1
 
     def run(self):

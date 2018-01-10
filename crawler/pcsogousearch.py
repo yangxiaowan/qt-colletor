@@ -18,11 +18,6 @@ class PcSogouSearch(MySearch):
     # 当前解析页面
     cur_parse_page = 0
 
-    # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
-    other_search_dit = {}
-
-    relate_search_list = {}
-
     website_start_url = 'https://www.sogou.com/web'
 
     domain_url = 'https://www.sogou.com/web?query='
@@ -35,10 +30,14 @@ class PcSogouSearch(MySearch):
 
     recommend_search_index = 0
 
-    # 网站词条解析数组
-    content_parse_list = []
-
     def genrate_pageurl(self):
+        # 网站词条解析数组
+        self.content_parse_list = []
+
+        # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
+        self.other_search_dit = {}
+        self.relate_search_list = {}
+
         self.cur_parse_page = self.start_parse_index - 1
         for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1

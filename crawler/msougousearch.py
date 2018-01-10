@@ -18,14 +18,6 @@ class MSogouSearch(MySearch):
     # 档期解析页面
     cur_parse_page = 0
 
-    # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
-    other_search_dit = {}
-
-    relate_search_list = {}
-
-    # 网站词条解析数组
-    content_parse_list = []
-
     website_start_url = 'https://wap.sogou.com/web/searchList.jsp'
 
     domain_url = 'https://wap.sogou.com/web/searchList.jsp?keyword='
@@ -37,7 +29,13 @@ class MSogouSearch(MySearch):
     recommend_search_parseflag = False
 
     def genrate_pageurl(self):
-        super().genrate_pageurl()
+        # 网站词条解析数组
+        self.content_parse_list = []
+
+        # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
+        self.other_search_dit = {}
+        self.relate_search_list = {}
+
         self.cur_parse_page = self.start_parse_index - 1
         for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1
@@ -140,7 +138,8 @@ class MSogouSearch(MySearch):
                             content_div_item.find("div", attrs={'class': re.compile("^(info|text-layout)$")})
                         if content_desc_div is None:
                             content_desc_div = content_div_item.find("div")
-                        setattr(craw_item, 'content', re.sub('[\r\n\t\b ]', '', content_desc_div.get_text()))
+                        if content_desc_div is not None:
+                            setattr(craw_item, 'content', re.sub('[\r\n\t\b ]', '', content_desc_div.get_text()))
                         website_domain_span = content_div_item.find("div", attrs={'class': re.compile(".*(citeurl).*")})
                         if website_domain_span is not None:
                             setattr(craw_item, 'domain', website_domain_span.get_text())

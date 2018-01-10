@@ -28,5 +28,5 @@ class CrawlerHandler(QtCore.QThread):
         end = time.time()
         print("———————————————————————运行用时———————————————————————")
         print(end - start)
-        time.sleep(1)
+        time.sleep(2)
         self.finishSignal.emit(['FINISH'])

@@ -12,11 +12,6 @@ class MShenmaSearch(MySearch):
     # 档期解析页面
     cur_parse_page = 0
 
-    # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
-    other_search_dit = {}
-
-    relate_search_list = {}
-
     website_start_url = 'http://m.sm.cn'
 
     domain_url = 'http://m.sm.cn/s?q='
@@ -27,11 +22,14 @@ class MShenmaSearch(MySearch):
     # 是否进行推荐搜索的解析
     recommend_search_parseflag = False
 
-    # 网站词条解析数组
-    content_parse_list = []
-
     def genrate_pageurl(self):
-        super().genrate_pageurl()
+        # 网站词条解析数组
+        self.content_parse_list = []
+
+        # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
+        self.other_search_dit = {}
+        self.relate_search_list = {}
+
         self.cur_parse_page = self.start_parse_index - 1
         for page_index in range(self.start_parse_index, self.end_parse_index + 1):
             self.cur_parse_page += 1
@@ -69,7 +67,7 @@ class MShenmaSearch(MySearch):
                         setattr(craw_item, 'content', content_desc_p.get_text())
                     else:
                         setattr(craw_item, 'content', content_div_item.get_text())
-                    down_link_div = result.find("div", attrs={'class': 'other'})
+                    down_link_div = content_div_item.find("div", attrs={'class': 'other'})
                     if down_link_div is not None:
                         setattr(craw_item, 'domain', down_link_div.get_text())
                 self.content_parse_list.append(craw_item)
@@ -95,6 +93,5 @@ class MShenmaSearch(MySearch):
     def parse_other_search(self, result):
         pass
 
-
-test = MShenmaSearch("全名彩票", 1, 2)
-test.genrate_pageurl()
+# test = MShenmaSearch("全名彩票", 1, 2)
+# test.genrate_pageurl()

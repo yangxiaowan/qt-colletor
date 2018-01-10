@@ -15,14 +15,6 @@ class MySearch(object):
     # 档期解析页面
     cur_parse_page = 0
 
-    # 其他搜索字段; 包括推荐搜索 90%的人还搜索了什么之类的
-    other_search_dit = {}
-
-    relate_search_list = {}
-
-    # 网站词条解析数组
-    content_parse_list = []
-
     website_start_url = None
 
     domain_url = None
