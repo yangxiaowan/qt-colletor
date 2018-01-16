@@ -73,8 +73,8 @@ class PcSogouSearch(MySearch):
                 text = relate_search_item.find("a").string
                 relate_url = self.website_start_url + relate_search_item.find("a").get("href")
                 url = re.sub('\n', '', relate_url)
-                relate_str += '序号: %d ,  词条: %s  ||  ' % \
-                              (item_index, text,)
+                relate_str += '%s , ' % \
+                              (text,)
             if self.cur_parse_page > 1:
                 self.recommend_search_index = 2
             self.relate_search_list[self.recommend_search_index] = relate_str
@@ -121,7 +121,9 @@ class PcSogouSearch(MySearch):
                 title_h3_a = title_h3.find("a")
                 if title_h3_a is not None:
                     setattr(craw_item, 'title', title_h3_a.get_text().replace('\n', ''))
-                    setattr(craw_item, 'page_url', title_h3_a.get("href").replace('\n', ''))
+                    href_str = title_h3_a.get("href")
+                    if href_str is not None:
+                        setattr(craw_item, 'page_url', href_str.replace('\n', ''))
                     str_info_div = content_div_item.find("div", attrs={'class': 'str_info_div'})
                     if str_info_div is not None:
                         p_text = str_info_div.find("p")
@@ -138,12 +140,15 @@ class PcSogouSearch(MySearch):
                         setattr(craw_item, 'domain', website_domain)
                 # 解析搜狗知识，类似百度知道的模块
                 str_pd_box = content_div_item.find("div", attrs={'class': 'str-pd-box'})
+                self.content_parse_list.append(craw_item)
+                print(craw_item)
                 if str_pd_box is not None:
                     start_box_item_start = str_pd_box.find("p", attrs={'class': 'str_time'})
                     if start_box_item_start is not None:
                         craw_box_item = CrawlerItem()
                         setattr(craw_box_item, 'title', start_box_item_start.get_text().replace('\n', ''))
-                        setattr(craw_box_item, 'page', start_box_item_start.find("a").get("href").replace('\n', ''))
+                        setattr(craw_box_item, 'page_url', start_box_item_start.find("a").get("href").replace('\n', ''))
+                        self.content_parse_list.append(craw_box_item)
                         print(craw_box_item)
                     start_box_item_list = str_pd_box.find("ul")
                     if start_box_item_list is not None:
@@ -151,12 +156,11 @@ class PcSogouSearch(MySearch):
                         for li_list_item in li_list:
                             craw_box_item = CrawlerItem()
                             setattr(craw_box_item, 'title', li_list_item.find("a").get_text().replace('\n', ''))
-                            setattr(craw_box_item, 'page', li_list_item.find("a").get("href").replace('\n', ''))
+                            setattr(craw_box_item, 'page_url', li_list_item.find("a").get("href").replace('\n', ''))
+                            self.content_parse_list.append(craw_box_item)
                             print(craw_box_item)
-                self.content_parse_list.append(craw_item)
-                print(craw_item)
         print("搜索到网站词条数目为:", len(content_div_list))
         print("解析搜狗网站词条内容结束.....................")
 
-# test = PcSogouSearch("全民彩票", 1, 2)
+# test = PcSogouSearch("全民彩票合法吗", 1, 2)
 # test.genrate_pageurl()

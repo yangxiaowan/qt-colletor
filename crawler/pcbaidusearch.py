@@ -80,8 +80,8 @@ class PcBaiduSearch(MySearch):
                 item_index += 1
                 text = relate_search_item.find("a").get_text()
                 url = self.website_start_url + relate_search_item.find("a").get("href")
-                relate_str += '序号: %d ,  词条: %s ,  || ' % \
-                              (item_index, text)
+                relate_str += '%s , ' % \
+                              (text)
             self.relate_search_list[0] = relate_str
             print(relate_str)
             print(self.relate_search_list)
@@ -153,15 +153,15 @@ class PcBaiduSearch(MySearch):
                 self.content_parse_list.append(craw_item)
                 # 解析类似于百度知道的下拉连接
                 if offset_div is not None:
-                    craw_other_item = CrawlerItem()
-                    down_list_tr = offset_div.find_all("tr")
+                    down_list_tr = offset_div.find_all("a")
                     print("解析百度知道，找到下拉连接个数： ", len(down_list_tr))
                     for down_item in down_list_tr:
-                        setattr(craw_other_item, 'title', down_item.find("a").get_text())
-                        setattr(craw_other_item, 'page', down_item.find("a").get("href"))
+                        craw_other_item = CrawlerItem()
+                        setattr(craw_other_item, 'title', down_item.get_text())
+                        setattr(craw_other_item, 'page_url', down_item.get("href"))
                         print(craw_other_item)
                         self.content_parse_list.append(craw_other_item)
                 print(craw_item)
 
-# test = PcBaiduSearch("全民彩票", 1, 10, 5)
+# test = PcBaiduSearch("全民彩票合法吗", 1, 10, 5)
 # test.genrate_pageurl()

@@ -80,7 +80,7 @@ class M360Search(MySearch):
             item_index += 1
             text = every_search_item.get_text()
             url = self.website_start_url + str(every_search_item.get("href"))
-            relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+            relate_str += '%s , ' % (text,)
         self.relate_search_list[0] = relate_str
         print(self.relate_search_list)
         print("解析移动端360相关搜索结束......................")

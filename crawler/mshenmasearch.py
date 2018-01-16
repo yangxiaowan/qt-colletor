@@ -85,7 +85,7 @@ class MShenmaSearch(MySearch):
                 item_index += 1
                 text = relate_search_item.get_text()
                 url = self.website_start_url + relate_search_item.get("href")
-                relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+                relate_str += '%s , ' % (text,)
             self.relate_search_list[self.cur_parse_page] = relate_str
             print(self.relate_search_list)
         print("移动端神马相关搜索解析完毕.....................")

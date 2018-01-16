@@ -85,7 +85,7 @@ class Pc360Search(MySearch):
                 item_index += 1
                 text = every_search_aitem.get_text()
                 url = self.website_start_url + every_search_aitem.get("href")
-                relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+                relate_str += '%s , ' % (text,)
             self.relate_search_list[0] = relate_str
         print(self.relate_search_list)
         print("解析360相关搜索结束......................")
@@ -126,8 +126,18 @@ class Pc360Search(MySearch):
                 setattr(craw_item, 'domain', linkinfo)
                 setattr(craw_item, 'index', self.page_index)
                 self.content_parse_list.append(craw_item)
+                more_answer = res_list_item.find("ul", attrs={"class", "more-ans"})
                 print(craw_item)
+                if more_answer is not None:
+                    more_answer_alist = more_answer.find_all("a")
+                    if len(more_answer_alist) > 0:
+                        for more_answer_item in more_answer_alist:
+                            craw_son_item = CrawlerItem()
+                            setattr(craw_son_item, 'title', more_answer_item.get_text())
+                            setattr(craw_son_item, 'page_url', more_answer_item.get("href"))
+                            self.content_parse_list.append(craw_son_item)
+                            print(craw_son_item)
         print("解析360页面结束......................")
 
-# test = Pc360Search("全民彩票", 10, 10, 10)
+# test = Pc360Search("全民彩票合法吗", 1, 2, 10)
 # test.genrate_pageurl()

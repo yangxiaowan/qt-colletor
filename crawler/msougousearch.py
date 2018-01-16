@@ -80,7 +80,7 @@ class MSogouSearch(MySearch):
                 item_index += 1
                 text = relate_search_aitem.get_text()
                 url = self.website_start_url + relate_search_aitem.get("href")
-                relate_str += '序号: %d ,  词条: %s  ||  ' % (item_index, text,)
+                relate_str += '%s , ' % (text,)
             self.relate_search_list[0] = relate_str
             print(self.relate_search_list)
         print("移动端搜狗相关搜索解析完毕.....................")
